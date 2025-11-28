@@ -72,10 +72,22 @@ if (resolved.error || !existsSync(resolved.viteBin)) {
   process.exit(1)
 }
 
+/**
+ * Enforce Vite major version == 4 using runtime check via require('vite/package.json').version.
+ * Exit if version >=5 and instruct to reinstall pinned v4.
+ */
 // Enforce Vite major version == 4
-const viteVersion = resolved.viteVersion
+const viteVersion = (() => {
+  try {
+    // Explicit check using require('vite/package.json').version as requested
+    const v = require('vite/package.json').version
+    return String(v || resolved.viteVersion || '')
+  } catch {
+    return String(resolved.viteVersion || '')
+  }
+})()
 const major = Number((viteVersion || '0').split('.')[0])
-if (!/^4\./.test(viteVersion || '')) {
+if (!(major === 4)) {
   console.error(
     `[fatal] Vite ${viteVersion} detected. This project requires Vite 4.x under Node 18.\n` +
       `Please reinstall with pinned versions:\n` +
