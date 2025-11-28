@@ -1,7 +1,11 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
+/**
+ * Vite v4 configuration (Node 18 compatible).
+ * Avoids Node 20-only APIs and Vite 5+ options.
+ * Docs: https://v4.vitejs.dev/config/
+ */
 export default defineConfig({
   plugins: [react()],
   esbuild: {

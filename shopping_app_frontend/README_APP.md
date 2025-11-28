@@ -25,10 +25,12 @@ Run locally:
 - npm run dev (port 5173 by default for Vite dev) or use existing preview runner (port 3000) in the environment.
 - In this workspace, the orchestrator exposes preview on port 3000; no changes are required here.
 
-Environment compatibility:
-- Tooling is pinned to Vite 4.5.3 and React 18 to be compatible with Node 18.x used by the environment.
+Environment compatibility (Node 18 target):
+- This project targets Node 18.x for development and preview. Do NOT upgrade Node to run it.
+- Tooling is pinned to Vite 4.5.3 and @vitejs/plugin-react 3.1.0 to avoid Node 20+ requirements that trigger "crypto.hash is not a function".
 - package.json sets engines.node to ">=18 <20" and uses exact versions (no caret) to avoid accidental upgrades in CI.
-- npm-shrinkwrap.json pins Vite (4.5.3) and @vitejs/plugin-react (3.1.0) to ensure deterministic installs in CI environments without a lockfile.
+- npm-shrinkwrap.json locks vite (4.5.3) and @vitejs/plugin-react (3.1.0) to ensure deterministic installs, and overrides/resolutions enforce these versions.
+- Scripts: `npm run build` attempts `vite build` first and falls back to a minimal `esbuild` bundling strategy if the environment ignores pins.
 
 Accessibility:
 - Semantic elements (header, main, section, article)

@@ -11,7 +11,7 @@
     "build:tizen": "vite build || node ./scripts/build-fallback.js",
     "package:tizen": "cd dist && zip -r ../app.wgt * ../config.xml",
     "postinstall": "node -e \"try{const p=require('./package.json');if(p.devDependencies&&p.devDependencies.vite){console.log('Using vite',p.devDependencies.vite)} }catch(e){process.exit(0)}\"",
-    "prepare": "node -e \"const fs=require('fs');if(!fs.existsSync('npm-shrinkwrap.json')){console.warn('Warning: npm-shrinkwrap.json missing; installs may drift.')}}\""
+    "prepare": "node -e \"const fs=require('fs');if(!fs.existsSync('npm-shrinkwrap.json')){console.warn('Warning: npm-shrinkwrap.json missing; installs may drift.') }}\""
   },
   "dependencies": {
     "react": "18.2.0",
@@ -33,6 +33,10 @@
     "node": ">=18 <20"
   },
   "overrides": {
+    "vite": "4.5.3",
+    "@vitejs/plugin-react": "3.1.0"
+  },
+  "resolutions": {
     "vite": "4.5.3",
     "@vitejs/plugin-react": "3.1.0"
   },
