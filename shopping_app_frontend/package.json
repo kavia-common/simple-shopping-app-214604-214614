@@ -5,14 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "node ./scripts/run-vite-local.js",
-    "dev:purge-cache": "node -e \"try{require('fs').rmSync('node_modules/.vite',{recursive:true,force:true});console.log('Purged node_modules/.vite cache')}catch(e){console.warn('No .vite cache to purge')}}\" && node ./scripts/run-vite-local.js",
+    "dev:purge-cache": "node -e \"try{require('fs').rmSync('node_modules/.vite',{recursive:true,force:true});require('fs').rmSync('.vite',{recursive:true,force:true});console.log('Purged Vite caches')}catch(e){console.warn('No Vite cache to purge')}\" && node ./scripts/run-vite-local.js",
     "build": "node ./scripts/run-vite-local.js build || node ./scripts/build-fallback.js",
     "lint": "eslint .",
     "preview": "node ./scripts/run-vite-local.js preview",
     "build:tizen": "node ./scripts/run-vite-local.js build || node ./scripts/build-fallback.js",
     "package:tizen": "cd dist && zip -r ../app.wgt * ../config.xml",
     "postinstall": "node -e \"try{const p=require('./package.json');if(p.devDependencies&&p.devDependencies.vite){console.log('Using vite',p.devDependencies.vite)} }catch(e){process.exit(0)}\"",
-    "prepare": "node -e \"const fs=require('fs');if(!fs.existsSync('npm-shrinkwrap.json')){console.warn('Warning: npm-shrinkwrap.json missing; installs may drift.') }}\""
+    "prepare": "node -e \"const fs=require('fs');if(!fs.existsSync('npm-shrinkwrap.json')){console.warn('Warning: npm-shrinkwrap.json missing; installs may drift.') }\""
   },
   "dependencies": {
     "react": "18.2.0",
