@@ -7,12 +7,12 @@
  * and ensures:
  *  - .vite caches are purged before start
  *  - host=0.0.0.0, port=3000, strictPort=true
- *  - flags from CLI are forwarded
+ *  - flags from CLI are forwarded (including --host and --port to override defaults)
  *  - allowedHosts relaxed via config (vite.config.js handles it)
  *
  * Usage examples:
  *   node scripts/run-vite-preview.js dev -- --open
- *   node scripts/run-vite-preview.js preview
+ *   node scripts/run-vite-preview.js preview -- --port 5173 --host 0.0.0.0
  */
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -67,7 +67,6 @@ const argv = process.argv.slice(2)
 let action = 'dev'
 let passArgs = []
 if (argv.length > 0) {
-  // If first arg is one of dev/preview/build, treat as action
   const candidate = String(argv[0] || '').trim()
   if (['dev', 'preview', 'build'].includes(candidate)) {
     action = candidate
@@ -80,8 +79,28 @@ if (argv.length > 0) {
 // Purge caches first
 purgeViteCaches()
 
-// Always run via npx vite@4.5.3 and fix host/port/strictPort; forward flags after --
-const fixedFlags = ['--host', '0.0.0.0', '--port', '3000', '--strictPort']
+// Default flags
+let host = '0.0.0.0'
+let port = '3000'
+
+// Inspect pass-through args for explicit --host/--port overrides
+for (let i = 0; i < passArgs.length; i++) {
+  const a = String(passArgs[i] || '')
+  if (a === '--host' && typeof passArgs[i + 1] !== 'undefined') {
+    host = String(passArgs[i + 1])
+    i++
+  } else if (a.startsWith('--host=')) {
+    host = a.split('=').slice(1).join('=')
+  } else if (a === '--port' && typeof passArgs[i + 1] !== 'undefined') {
+    port = String(passArgs[i + 1])
+    i++
+  } else if (a.startsWith('--port=')) {
+    port = a.split('=').slice(1).join('=')
+  }
+}
+
+// Compose fixed flags with possible overrides and ensure strictPort
+const fixedFlags = ['--host', host, '--port', port, '--strictPort']
 const args = ['--yes', 'vite@4.5.3', action, ...fixedFlags, ...passArgs]
 
 console.log(`[preview] Launching: npx ${args.join(' ')}`)
