@@ -23,6 +23,8 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     strictPort: true,
+    // Allow preview host used by the orchestrator
+    allowedHosts: ['vscode-internal-22154-beta.beta01.cloud.kavia.ai'],
     hmr: { host: '0.0.0.0', port: 3000 }
   },
   preview: {
