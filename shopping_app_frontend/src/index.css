@@ -14,9 +14,12 @@
   --muted: #6B7280;
 }
 
-body {
-  width: 1920px;
-  height: 1080px;
+html, body, #root {
+  width: 100%;
+  height: 100%;
+}
+
+html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -25,7 +28,9 @@ body {
   color: var(--text);
 }
 
+/* Ensure the root flex container can size properly in varying preview shells */
 #root {
-  width: 100%;
-  height: 100%;
+  display: flex;
+  min-width: 320px;
+  min-height: 480px;
 }

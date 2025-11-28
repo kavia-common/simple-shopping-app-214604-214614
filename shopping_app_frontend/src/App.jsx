@@ -571,6 +571,18 @@ function App() {
     >
       <TopBar cartCount={cartCount} />
       <main style={{ flex: 1, overflow: 'hidden auto' }}>
+        {/* Visible placeholder strip to confirm content area renders */}
+        <div
+          style={{
+            display: 'none',
+            padding: '6px 12px',
+            fontSize: 12,
+            color: theme.muted,
+          }}
+          aria-hidden="true"
+        >
+          Ocean Shop ready
+        </div>
         <ProductGrid products={products} onAdd={addToCart} />
       </main>
       <BottomBar cartCount={cartCount} onOpenCart={() => setCartOpen(true)} />

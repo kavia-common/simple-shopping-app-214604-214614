@@ -2,9 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 /**
- * Vite v4 configuration (Node 18 compatible).
- * Avoids Node 20-only APIs and Vite 5+ options.
- * Docs: https://v4.vitejs.dev/config/
+ * Vite configuration tuned for Node 18 dev with a build fallback.
+ * - We pin Vite 4 in package.json, but in case the environment installs Vite 5/7,
+ *   avoid deprecated options that cause warnings and keep settings compatible.
  */
 export default defineConfig({
   plugins: [react()],
@@ -13,9 +13,8 @@ export default defineConfig({
     target: 'es2020',
   },
   optimizeDeps: {
-    // Some CI environments + Node 18 + older plugin graph can trigger optimizer
-    // code paths that rely on newer Node APIs. Disable pre-optimization to avoid it.
-    disabled: true,
+    // For Vite >=5, `disabled` is removed. Using noDiscovery provides similar effect.
+    noDiscovery: true,
   },
   build: {
     target: 'es2020',
