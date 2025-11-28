@@ -2,12 +2,12 @@
 /**
  * PUBLIC_INTERFACE
  * run-vite-local.js
- * Ensures we execute the locally pinned Vite (4.5.x) under Node 18, avoiding any global/hoisted Vite 5+/7+.
- * Usage mirrors `vite` CLI: node ./scripts/run-vite-local.js [command] [flags]
- * - Forwards all extra CLI flags (e.g., `-- --port 3000 --host 0.0.0.0`)
- * - Always resolves ./node_modules/vite/bin/vite.js
- * - Falls back to `npx --yes vite@4.5.3` if local resolve fails
- * - Purges node_modules/.vite and .vite caches before start to avoid optimizer/hash mismatches
+ * Zero-dependency dev launcher:
+ * - Always executes local Vite 4.x from node_modules if present.
+ * - Falls back to `npx --yes vite@4.5.3` when local module is missing.
+ * - Never touches any globally installed vite.
+ * - Purges Vite caches to avoid residue from other majors.
+ * - Forwards all CLI args, e.g. `-- --host 0.0.0.0 --port 3000`.
  */
 import { createRequire } from 'module'
 import { spawn } from 'node:child_process'
@@ -20,18 +20,16 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const projectRoot = resolve(__dirname, '..')
 
-// Guard Node runtime (Node 18 required)
+// Guard Node runtime (Node 18 targeted)
 const nodeMajor = Number(process.versions.node.split('.')[0] || 0)
 if (!(nodeMajor >= 18 && nodeMajor < 20)) {
-  console.warn(`[warn] Detected Node ${process.versions.node}. This project targets Node 18.x only.`)
+  console.warn(`[warn] Detected Node ${process.versions.node}. This project targets Node 18.x.`)
 }
 
 const require = createRequire(import.meta.url)
 
-// Resolve local vite package.json to enforce version and compute correct CLI
 function resolveLocalVite() {
   try {
-    // Resolve via require.resolve to avoid PATH/global leaks
     const vitePkgPath = require.resolve('vite/package.json', { paths: [projectRoot] })
     const vitePkg = JSON.parse(readFileSync(vitePkgPath, 'utf8'))
     const viteVersion = String(vitePkg.version || '')
@@ -61,10 +59,7 @@ function purgeViteCaches() {
 }
 
 // MAIN
-// Forward all provided arguments (including after double-dash)
 const args = process.argv.slice(2)
-
-// Try resolve local vite
 const resolved = resolveLocalVite()
 
 // Enforce Vite major version == 4 if resolved
@@ -79,9 +74,8 @@ if (!resolved.error && existsSync(resolved.viteBin)) {
   if (major !== 4) {
     console.error(
       `[fatal] Vite ${viteVersion} detected. This project requires Vite 4.x under Node 18.\n` +
-        `Please reinstall with pinned versions:\n` +
-        `  - vite@4.5.3\n  - @vitejs/plugin-react@3.1.0\n` +
-        `Then re-run: npm ci (or npm install)`,
+        `Use the NPX fallback or reinstall with pinned versions:\n` +
+        `  - vite@4.5.3\n  - @vitejs/plugin-react@3.1.0\n`,
     )
     process.exit(1)
   }
@@ -90,7 +84,6 @@ if (!resolved.error && existsSync(resolved.viteBin)) {
 // Always purge caches before starting to be safe in preview runners
 purgeViteCaches()
 
-// Spawn helper
 function spawnInherit(cmd, cmdArgs) {
   const child = spawn(cmd, cmdArgs, {
     stdio: 'inherit',
@@ -109,7 +102,6 @@ function spawnInherit(cmd, cmdArgs) {
   })
 }
 
-// Prefer exact local vite binary; log path and version for diagnostics
 if (!resolved.error && existsSync(resolved.viteBin)) {
   if (viteVersion) {
     console.log(`[runner] Using local Vite ${viteVersion} at ${resolved.viteBin}`)
@@ -118,8 +110,6 @@ if (!resolved.error && existsSync(resolved.viteBin)) {
   }
   spawnInherit(process.execPath, [resolved.viteBin, ...args])
 } else {
-  // Fallback: npx vite@4.5.3
   console.warn('[runner] Local vite not found. Falling back to npx vite@4.5.3')
-  // Use --yes to ensure non-interactive
   spawnInherit('npx', ['--yes', 'vite@4.5.3', ...args])
 }
