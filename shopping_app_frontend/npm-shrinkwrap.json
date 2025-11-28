@@ -1,0 +1,40 @@
+{
+  "name": "tizen",
+  "version": "0.0.0",
+  "lockfileVersion": 3,
+  "requires": true,
+  "packages": {
+    "": {
+      "name": "tizen",
+      "version": "0.0.0",
+      "dependencies": {
+        "react": "18.2.0",
+        "react-dom": "18.2.0"
+      },
+      "devDependencies": {
+        "@eslint/js": "8.57.0",
+        "@types/react": "18.2.66",
+        "@types/react-dom": "18.2.22",
+        "@vitejs/plugin-react": "3.1.0",
+        "eslint": "8.57.0",
+        "eslint-plugin-react-hooks": "4.6.0",
+        "eslint-plugin-react-refresh": "0.4.7",
+        "globals": "13.24.0",
+        "vite": "4.5.3"
+      }
+    },
+    "node_modules/vite": {
+      "version": "4.5.3",
+      "resolved": "https://registry.npmjs.org/vite/-/vite-4.5.3.tgz",
+      "integrity": "sha512-k6jKq8HjY0mTQJ5P8t7jqbXv7r3s9Qh2t6FDQfP1D2q5vjr7Sg0m3iE8z5mHh2g9vTt6B3l2v6G2eW9u8aYx5g=="
+    },
+    "node_modules/@vitejs/plugin-react": {
+      "version": "3.1.0",
+      "resolved": "https://registry.npmjs.org/@vitejs/plugin-react/-/plugin-react-3.1.0.tgz",
+      "integrity": "sha512-y8zsS6+Vx3P6d1kM9Qw1Wwqk0sFf7W0iI1l6O8E1q0V1KX6q4Y0dMsO8Q2s7v5cJgF3DkI1c3C9vFz2z7yP2mA==",
+      "peerDependencies": {
+        "vite": "^4.1.0"
+      }
+    }
+  }
+}

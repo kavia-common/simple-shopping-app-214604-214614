@@ -4,6 +4,16 @@
   box-sizing: border-box;
 }
 
+:root {
+  --primary: #2563EB;
+  --secondary: #F59E0B;
+  --error: #EF4444;
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --text: #111827;
+  --muted: #6B7280;
+}
+
 body {
   width: 1920px;
   height: 1080px;
@@ -11,8 +21,8 @@ body {
   padding: 0;
   overflow: hidden;
   font-family: 'Samsung Sharp Sans', Arial, sans-serif;
-  background: #000;
-  color: #fff;
+  background: var(--bg);
+  color: var(--text);
 }
 
 #root {

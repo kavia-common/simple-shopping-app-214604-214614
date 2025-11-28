@@ -1,45 +1,21 @@
+/* Ocean Professional - minimal helpers.
+   Most styles live inline in components to fit TV 1920x1080 canvas and tokens. */
+
 .tv-app {
   width: 1920px;
   height: 1080px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-  color: #fff;
+  position: relative;
+  overflow: hidden;
 }
 
-h1 {
-  font-size: 72px;
-  margin-bottom: 60px;
+button:focus-visible {
+  outline: 3px solid rgba(37,99,235,0.6);
+  outline-offset: 2px;
+  border-radius: 12px;
 }
 
-.content {
-  text-align: center;
-}
-
-button {
-  font-size: 32px;
-  padding: 20px 60px;
-  border-radius: 10px;
-  border: 3px solid #666;
-  background: #222;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-button:hover,
-button:focus {
-  border-color: #00aaff;
-  background: #00aaff;
-  color: #000;
-  transform: scale(1.1);
-  outline: none;
-}
-
-p {
-  margin-top: 30px;
-  font-size: 24px;
-  color: #888;
+/* Prevent image drag highlight on TV remotes */
+img {
+  user-select: none;
+  -webkit-user-drag: none;
 }
