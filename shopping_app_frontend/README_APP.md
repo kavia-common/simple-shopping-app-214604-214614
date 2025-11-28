@@ -22,7 +22,7 @@ How to adjust theme:
 - Components reference these tokens for colors, shadows, and radii.
 
 Run locally:
-- npm run dev (port 5173 by default for Vite dev) or use existing preview runner (port 3000) in the environment.
+- npm run dev (binds to 0.0.0.0:3000 in this workspace and uses the pinned local Vite 4 runner)
 - In this workspace, the orchestrator exposes preview on port 3000; no changes are required here.
 
 Environment compatibility (Node 18 target):

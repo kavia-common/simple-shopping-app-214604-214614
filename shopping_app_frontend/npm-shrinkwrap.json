@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "lockfileVersion": 3,
   "requires": true,
+  "__note": "This project uses a local runner (scripts/run-vite-local.js) to always execute the pinned local vite (4.5.x) under Node 18.",
   "packages": {
     "": {
       "name": "tizen",

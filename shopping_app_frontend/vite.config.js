@@ -8,18 +8,14 @@ import react from '@vitejs/plugin-react'
  * - HMR ports fixed to 3000 without hardcoding host to avoid proxy handshake issues.
  */
 export default defineConfig({
-  plugins: [react()],
   base: '/',
-  esbuild: {
-    target: 'es2020',
-  },
-  // Vite v4-compatible optimizeDeps section. If hashing issues persist, uncomment `force: true`.
+  plugins: [react()],
+  esbuild: { target: 'es2020' },
+  // Vite v4-compatible optimizeDeps. If hashing issues persist on some envs, toggle force.
   optimizeDeps: {
     // force: true,
   },
-  build: {
-    target: 'es2020',
-  },
+  build: { target: 'es2020' },
   server: {
     host: '0.0.0.0',
     port: 3000,
