@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:clean": "rm -rf node_modules/.vite && vite",
+    "dev:clean": "vite", 
+    "dev:purge-cache": "node -e \"try{require('fs').rmSync('node_modules/.vite',{recursive:true,force:true});console.log('Purged node_modules/.vite cache')}catch(e){console.warn('No .vite cache to purge')}}\" && vite",
     "build": "vite build || node ./scripts/build-fallback.js",
     "lint": "eslint .",
     "preview": "vite preview",

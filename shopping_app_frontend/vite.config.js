@@ -2,9 +2,10 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 /**
- * Vite configuration tuned for Node 18 dev with a build fallback.
- * - We pin Vite 4 in package.json, but in case the environment installs Vite 5/7,
- *   avoid deprecated options that cause warnings and keep settings compatible.
+ * Vite configuration tuned for Node 18 with Vite v4.x.
+ * - Avoid Vite v5+/v7-only options.
+ * - Bind dev server to port 3000 with strictPort and allowedHosts.
+ * - HMR ports fixed to 3000 without hardcoding host to avoid proxy handshake issues.
  */
 export default defineConfig({
   plugins: [react()],
@@ -12,9 +13,9 @@ export default defineConfig({
   esbuild: {
     target: 'es2020',
   },
+  // Vite v4-compatible optimizeDeps section. If hashing issues persist, uncomment `force: true`.
   optimizeDeps: {
-    // For Vite >=5, `disabled` is removed. Using noDiscovery provides similar effect.
-    noDiscovery: true,
+    // force: true,
   },
   build: {
     target: 'es2020',
@@ -23,8 +24,11 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     strictPort: true,
-    // Explicitly allow the preview host used by the orchestrator to prevent Vite blocked host error.
     allowedHosts: ['vscode-internal-22154-beta.beta01.cloud.kavia.ai'],
+    hmr: {
+      clientPort: 3000,
+      port: 3000,
+    },
   },
   preview: {
     host: '0.0.0.0',
