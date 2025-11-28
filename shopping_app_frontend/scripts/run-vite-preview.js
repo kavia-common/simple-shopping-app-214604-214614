@@ -3,16 +3,15 @@
  * PUBLIC_INTERFACE
  * run-vite-preview.js
  * Force-run Vite v4.5.3 via NPX for dev/preview in environments where node_modules
- * may contain a different vite (e.g., v7). This bypasses any predev/version guard
- * and ensures:
- *  - .vite caches are purged before start
- *  - host=0.0.0.0, port=3000, strictPort=true
- *  - flags from CLI are forwarded (including --host and --port to override defaults)
- *  - allowedHosts relaxed via config (vite.config.js handles it)
+ * may contain a different vite (e.g., v7). This bypasses local vite and:
+ *  - Purges .vite caches before start
+ *  - Ensures host=0.0.0.0, port=3000, strictPort=true by default
+ *  - Forwards CLI flags, allowing explicit --host/--port overrides
+ *  - Works in Node 18; does not rely on local vite installation
  *
- * Usage examples:
+ * Usage:
  *   node scripts/run-vite-preview.js dev -- --open
- *   node scripts/run-vite-preview.js preview -- --port 5173 --host 0.0.0.0
+ *   node scripts/run-vite-preview.js preview -- --port=5173 --host=0.0.0.0
  */
 import { spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
@@ -24,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 const projectRoot = resolve(__dirname, '..')
 
-// Always purge Vite caches to avoid residue from other majors
+// Purge Vite caches to avoid optimizer residue between major versions
 function purgeViteCaches() {
   try {
     const nmVite = resolve(projectRoot, 'node_modules', '.vite')
@@ -48,7 +47,6 @@ function spawnInherit(cmd, args) {
     cwd: projectRoot,
     env: {
       ...process.env,
-      // Ensure Node flags are preserved if present
       NODE_OPTIONS: process.env.NODE_OPTIONS ? String(process.env.NODE_OPTIONS) : '',
     },
   })
@@ -62,8 +60,6 @@ function spawnInherit(cmd, args) {
 }
 
 const argv = process.argv.slice(2)
-// Accept a mode (dev|preview|build) then pass through any extra flags after a -- separator
-// Default action: dev
 let action = 'dev'
 let passArgs = []
 if (argv.length > 0) {
@@ -76,14 +72,14 @@ if (argv.length > 0) {
   }
 }
 
-// Purge caches first
+// Purge caches before launch
 purgeViteCaches()
 
-// Default flags
+// Defaults
 let host = '0.0.0.0'
 let port = '3000'
 
-// Inspect pass-through args for explicit --host/--port overrides
+// Pick up explicit overrides from pass-through args
 for (let i = 0; i < passArgs.length; i++) {
   const a = String(passArgs[i] || '')
   if (a === '--host' && typeof passArgs[i + 1] !== 'undefined') {
@@ -99,9 +95,9 @@ for (let i = 0; i < passArgs.length; i++) {
   }
 }
 
-// Compose fixed flags with possible overrides and ensure strictPort
-const fixedFlags = ['--host', host, '--port', port, '--strictPort']
-const args = ['--yes', 'vite@4.5.3', action, ...fixedFlags, ...passArgs]
+// Compose command ensuring strictPort, and forward all other flags as-is
+const baseFlags = ['--host', host, '--port', port, '--strictPort']
+const args = ['--yes', 'vite@4.5.3', action, ...baseFlags, ...passArgs]
 
 console.log(`[preview] Launching: npx ${args.join(' ')}`)
 spawnInherit('npx', args)

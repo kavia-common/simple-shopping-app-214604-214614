@@ -4,7 +4,6 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node -e \"console.log('[predev] bypass: no-op for preview/dev to avoid version guard')\"",
     "postinstall": "node -e \"const fs=require('fs');const path=require('path');try{const pkgPath=require.resolve('vite/package.json');const vite=JSON.parse(fs.readFileSync(pkgPath,'utf8')).version;const ok=/^4\\./.test(vite);if(!ok){console.error('[postinstall] vite '+vite+' is not v4.x (will not block dev). Ensure vite@4.5.3 in CI.');}try{fs.rmSync(path.join('node_modules','.vite'),{recursive:true,force:true});}catch{}try{fs.rmSync('.vite',{recursive:true,force:true});}catch{}console.log('[postinstall] Purged .vite caches');}catch(e){console.warn('[postinstall] Local vite not present yet; skipping verification.')}\"",
     "prestart": "node -e \"try{require('fs').rmSync('node_modules/.vite',{recursive:true,force:true});require('fs').rmSync('.vite',{recursive:true,force:true});console.log('[prestart] Purged Vite caches')}catch(e){console.warn('[prestart] No Vite cache to purge')}\"",
     "dev": "node scripts/run-vite-preview.js dev -- --host 0.0.0.0 --port 3000",
