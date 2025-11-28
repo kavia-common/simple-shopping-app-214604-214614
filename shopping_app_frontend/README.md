@@ -9,6 +9,10 @@ Currently, two official plugins are available:
 
 Note: This project targets Node 18 and uses Vite v4.5.x via a local runner (scripts/run-vite-local.js) to avoid inadvertently invoking a globally installed Vite (v5/v7). Use npm run dev to start the dev server.
 
+Additional guards:
+- Postinstall guard fails the install if vite is not 4.x and purges .vite caches automatically.
+- Run scripts/validate-vite-version.js to verify vite version at any time.
+
 ## React Compiler
 
 The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).

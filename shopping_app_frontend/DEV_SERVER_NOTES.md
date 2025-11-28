@@ -7,6 +7,7 @@
 - We invoke the local vite binary explicitly via scripts/run-vite-local.js to prevent any global/hoisted vite (v5/v7) from being used.
 - The runner validates vite version at runtime and will exit if 5+/7+ is detected.
 - Predev script also checks vite version via require.resolve and fails fast if not v4.x.
+- A postinstall guard validates vite is 4.x and purges node_modules/.vite and .vite caches after install.
 - The runner purges node_modules/.vite and .vite caches if it suspects they were produced by Vite 5+/7+.
 - Dependency optimizer is configured with optimizeDeps.entries = [] and esbuild target es2018 to avoid crypto.hash issues seen when newer stacks leak in.
 
