@@ -8,27 +8,27 @@ import react from '@vitejs/plugin-react'
  */
 export default defineConfig({
   plugins: [react()],
+  base: '/',
   esbuild: {
-    target: 'es2020'
+    target: 'es2020',
   },
   optimizeDeps: {
     // Some CI environments + Node 18 + older plugin graph can trigger optimizer
     // code paths that rely on newer Node APIs. Disable pre-optimization to avoid it.
-    disabled: true
+    disabled: true,
   },
   build: {
-    target: 'es2020'
+    target: 'es2020',
   },
   server: {
     host: '0.0.0.0',
     port: 3000,
     strictPort: true,
-    // Allow preview host used by the orchestrator
-    allowedHosts: ['vscode-internal-22154-beta.beta01.cloud.kavia.ai'],
-    hmr: { host: '0.0.0.0', port: 3000 }
+    // Let Vite infer allowed hosts and HMR target from the request origin to avoid blocking on unknown hostnames.
+    // Removing allowedHosts and explicit hmr host prevents WS connection errors that can blank the UI in preview runners.
   },
   preview: {
     host: '0.0.0.0',
-    port: 3000
-  }
+    port: 3000,
+  },
 })

@@ -1,5 +1,11 @@
 import { useEffect } from 'react';
 
+/**
+ * PUBLIC_INTERFACE
+ * useTizenKeys
+ * Adds TV-remote friendly keyboard handlers (arrows, Enter, Back).
+ * handlers: { onLeft?, onRight?, onUp?, onDown?, onEnter?, onBack? }
+ */
 export function useTizenKeys(handlers) {
   useEffect(() => {
     function handleKeyDown(e) {
