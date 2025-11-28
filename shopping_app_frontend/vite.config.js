@@ -7,6 +7,7 @@ import react from '@vitejs/plugin-react'
  * - Bind dev server to port 3000 with strictPort and allowedHosts.
  * - HMR ports fixed to 3000 without hardcoding host to avoid proxy handshake issues.
  * - Dependency optimizer configured to avoid crypto.hash issues on some environments.
+ * Note: Local runner enforces Vite 4.x; this config remains compatible with v4.
  */
 export default defineConfig({
   base: '/',
@@ -25,6 +26,7 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     strictPort: true,
+    // Ensure preview host allowed, required by orchestrator preview
     allowedHosts: ['vscode-internal-22154-beta.beta01.cloud.kavia.ai'],
     hmr: {
       clientPort: 3000,

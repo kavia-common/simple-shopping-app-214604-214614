@@ -4,6 +4,16 @@
   "lockfileVersion": 3,
   "requires": true,
   "__note": "This project uses a local runner (scripts/run-vite-local.js) to always execute the pinned local vite (4.5.x) under Node 18.",
+  "overrides": {
+    "vite": "4.5.3",
+    "@vitejs/plugin-react": "3.1.0",
+    "esbuild": "0.19.12"
+  },
+  "resolutions": {
+    "vite": "4.5.3",
+    "@vitejs/plugin-react": "3.1.0",
+    "esbuild": "0.19.12"
+  },
   "packages": {
     "": {
       "name": "tizen",
