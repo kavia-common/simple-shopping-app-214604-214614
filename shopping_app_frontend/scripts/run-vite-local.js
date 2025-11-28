@@ -4,6 +4,10 @@
  * run-vite-local.js
  * Ensures we execute the locally pinned Vite (4.5.x) under Node 18, avoiding any global/hoisted Vite 5+/7+.
  * Usage mirrors `vite` CLI: node ./scripts/run-vite-local.js [command] [flags]
+ * - Forwards all extra CLI flags (e.g., `-- --port 3000 --host 0.0.0.0`)
+ * - Always resolves ./node_modules/vite/bin/vite.js
+ * - Falls back to `npx --yes vite@4.5.3` if local resolve fails
+ * - Purges node_modules/.vite and .vite caches before start to avoid optimizer/hash mismatches
  */
 import { createRequire } from 'module'
 import { spawn } from 'node:child_process'
@@ -38,27 +42,18 @@ function resolveLocalVite() {
   }
 }
 
-// If a Vite 7 cache exists, purge it before starting to avoid optimizer/hash conflicts
-function purgeStaleViteCachesIfNeeded() {
+// Purge Vite caches to avoid residue from different major versions
+function purgeViteCaches() {
   try {
     const viteCacheDir = resolve(projectRoot, 'node_modules', '.vite')
     const dotViteCacheDir = resolve(projectRoot, '.vite')
-    // Heuristic: If cache exists but local vite is not 4.x, or we detect prior 5+/7+ run, clear.
-    let shouldPurge = false
-    try {
-      const { viteVersion } = resolveLocalVite()
-      if (!/^4\./.test(viteVersion || '')) shouldPurge = true
-    } catch {
-      // If we can't resolve local vite, best-effort purge
-      shouldPurge = true
-    }
-    if (existsSync(viteCacheDir) && shouldPurge) {
+    if (existsSync(viteCacheDir)) {
       rmSync(viteCacheDir, { recursive: true, force: true })
-      console.log('[info] Purged node_modules/.vite cache (potential Vite 7 residue)')
+      console.log('[info] Purged node_modules/.vite cache')
     }
-    if (existsSync(dotViteCacheDir) && shouldPurge) {
+    if (existsSync(dotViteCacheDir)) {
       rmSync(dotViteCacheDir, { recursive: true, force: true })
-      console.log('[info] Purged .vite cache (potential Vite 7 residue)')
+      console.log('[info] Purged .vite cache')
     }
   } catch (err) {
     console.warn('[warn] Failed to purge Vite caches:', err?.message || err)
@@ -66,60 +61,65 @@ function purgeStaleViteCachesIfNeeded() {
 }
 
 // MAIN
+// Forward all provided arguments (including after double-dash)
+const args = process.argv.slice(2)
+
+// Try resolve local vite
 const resolved = resolveLocalVite()
-if (resolved.error || !existsSync(resolved.viteBin)) {
-  console.error('[error] Unable to resolve local vite from node_modules. Did you run `npm install`?')
-  process.exit(1)
-}
 
-/**
- * Enforce Vite major version == 4 using runtime check via require('vite/package.json').version.
- * Exit if version >=5 and instruct to reinstall pinned v4.
- */
-// Enforce Vite major version == 4
-const viteVersion = (() => {
+// Enforce Vite major version == 4 if resolved
+let viteVersion = ''
+if (!resolved.error && existsSync(resolved.viteBin)) {
   try {
-    // Explicit check using require('vite/package.json').version as requested
-    const v = require('vite/package.json').version
-    return String(v || resolved.viteVersion || '')
+    viteVersion = require('vite/package.json').version || resolved.viteVersion || ''
   } catch {
-    return String(resolved.viteVersion || '')
+    viteVersion = resolved.viteVersion || ''
   }
-})()
-const major = Number((viteVersion || '0').split('.')[0])
-if (!(major === 4)) {
-  console.error(
-    `[fatal] Vite ${viteVersion} detected. This project requires Vite 4.x under Node 18.\n` +
-      `Please reinstall with pinned versions:\n` +
-      `  - vite@4.5.3\n  - @vitejs/plugin-react@3.1.0\n` +
-      `Then re-run: npm ci (or npm install)`,
-  )
-  process.exit(1)
+  const major = Number((viteVersion || '0').split('.')[0])
+  if (major !== 4) {
+    console.error(
+      `[fatal] Vite ${viteVersion} detected. This project requires Vite 4.x under Node 18.\n` +
+        `Please reinstall with pinned versions:\n` +
+        `  - vite@4.5.3\n  - @vitejs/plugin-react@3.1.0\n` +
+        `Then re-run: npm ci (or npm install)`,
+    )
+    process.exit(1)
+  }
 }
 
-// Purge caches if they may have been produced by a different Vite major
-purgeStaleViteCachesIfNeeded()
+// Always purge caches before starting to be safe in preview runners
+purgeViteCaches()
 
-// Sanitize args: remove any lingering "--force" flag which is unrelated and can mask issues
-const args = process.argv.slice(2).filter((a) => a !== '--force')
+// Spawn helper
+function spawnInherit(cmd, cmdArgs) {
+  const child = spawn(cmd, cmdArgs, {
+    stdio: 'inherit',
+    cwd: projectRoot,
+    env: {
+      ...process.env,
+      NODE_OPTIONS: process.env.NODE_OPTIONS ? String(process.env.NODE_OPTIONS) : '',
+    },
+  })
+  child.on('exit', (code, signal) => {
+    if (signal) {
+      process.kill(process.pid, signal)
+    } else {
+      process.exit(code ?? 0)
+    }
+  })
+}
 
-// Spawn the exact local vite CLI using current Node
-const child = spawn(process.execPath, [resolved.viteBin, ...args], {
-  stdio: 'inherit',
-  cwd: projectRoot,
-  env: {
-    // Remove any globally linked vite from PATH resolution by not using a bare "vite" spawn and keeping env clean.
-    // Also ensure npm config vars don't alter our resolver.
-    ...process.env,
-    // Defensive: prevent experimental loaders from hijacking resolution
-    NODE_OPTIONS: process.env.NODE_OPTIONS ? String(process.env.NODE_OPTIONS) : '',
-  },
-})
-
-child.on('exit', (code, signal) => {
-  if (signal) {
-    process.kill(process.pid, signal)
+// Prefer exact local vite binary; log path and version for diagnostics
+if (!resolved.error && existsSync(resolved.viteBin)) {
+  if (viteVersion) {
+    console.log(`[runner] Using local Vite ${viteVersion} at ${resolved.viteBin}`)
   } else {
-    process.exit(code ?? 0)
+    console.log(`[runner] Using local Vite at ${resolved.viteBin}`)
   }
-})
+  spawnInherit(process.execPath, [resolved.viteBin, ...args])
+} else {
+  // Fallback: npx vite@4.5.3
+  console.warn('[runner] Local vite not found. Falling back to npx vite@4.5.3')
+  // Use --yes to ensure non-interactive
+  spawnInherit('npx', ['--yes', 'vite@4.5.3', ...args])
+}

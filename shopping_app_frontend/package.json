@@ -4,9 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node -e \"try{const v=require('vite/package.json').version;if(parseInt(v.split('.')[0],10)>=5){console.error('Vite '+v+' detected; requires v4.x. Please reinstall pinned v4.');process.exit(1)};console.log('[predev] vite',v)}catch(e){console.error('[predev] Unable to resolve local vite. Run npm install.');process.exit(1)}\"",
-    "postinstall": "node -e \"const fs=require('fs');const path=require('path');try{const pj=JSON.parse(fs.readFileSync('package.json','utf8'));const vite=JSON.parse(fs.readFileSync(require.resolve('vite/package.json'), 'utf8')).version;const ok=/^4\\./.test(vite);if(!ok){console.error('[postinstall] FATAL: vite '+vite+' is not v4.x. Enforce vite@4.5.3, @vitejs/plugin-react@3.1.0, esbuild@0.19.12.');process.exit(1)};const p=path.join('node_modules','.vite');const d='.vite';try{fs.rmSync(p,{recursive:true,force:true});}catch{}try{fs.rmSync(d,{recursive:true,force:true});}catch{}console.log('[postinstall] Verified vite',vite,'and purged .vite caches');}catch(e){console.error('[postinstall] Could not verify local vite. Run npm ci/install.');process.exit(1)}\"",
+    "predev": "node -e \"try{const v=require('vite/package.json').version;const major=parseInt((v||'0').split('.')[0],10);if(major!==4){console.error('Vite '+v+' detected; requires v4.x. Please reinstall pinned v4.');process.exit(1)};console.log('[predev] vite',v)}catch(e){console.error('[predev] Unable to resolve local vite. Run npm install.');process.exit(1)}\"",
+    "postinstall": "node -e \"const fs=require('fs');const path=require('path');try{const vite=JSON.parse(fs.readFileSync(require.resolve('vite/package.json'), 'utf8')).version;const ok=/^4\\./.test(vite);if(!ok){console.error('[postinstall] FATAL: vite '+vite+' is not v4.x. Enforce vite@4.5.3, @vitejs/plugin-react@3.1.0, esbuild@0.19.12.');process.exit(1)};try{fs.rmSync(path.join('node_modules','.vite'),{recursive:true,force:true});}catch{}try{fs.rmSync('.vite',{recursive:true,force:true});}catch{}console.log('[postinstall] Verified vite',vite,'and purged .vite caches');}catch(e){console.error('[postinstall] Could not verify local vite. Run npm ci/install.');process.exit(1)}\"",
     "dev": "node scripts/run-vite-local.js",
+    "dev:v4": "node scripts/run-vite-local.js",
+    "start": "node scripts/run-vite-local.js",
     "dev:purge-cache": "node -e \"try{require('fs').rmSync('node_modules/.vite',{recursive:true,force:true});require('fs').rmSync('.vite',{recursive:true,force:true});console.log('Purged Vite caches')}catch(e){console.warn('No Vite cache to purge')}\" && node scripts/run-vite-local.js",
     "build": "node scripts/run-vite-local.js build || node scripts/build-fallback.js",
     "lint": "eslint .",
