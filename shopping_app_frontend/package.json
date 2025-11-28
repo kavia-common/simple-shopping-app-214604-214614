@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --force",
+    "dev": "vite",
+    "dev:clean": "rm -rf node_modules/.vite && vite",
     "build": "vite build || node ./scripts/build-fallback.js",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -34,11 +35,13 @@
   },
   "overrides": {
     "vite": "4.5.3",
-    "@vitejs/plugin-react": "3.1.0"
+    "@vitejs/plugin-react": "3.1.0",
+    "esbuild": "0.19.12"
   },
   "resolutions": {
     "vite": "4.5.3",
-    "@vitejs/plugin-react": "3.1.0"
+    "@vitejs/plugin-react": "3.1.0",
+    "esbuild": "0.19.12"
   },
   "packageManager": "npm@10"
 }

@@ -39,6 +39,11 @@
       "peerDependencies": {
         "vite": "^4.1.0"
       }
+    },
+    "node_modules/esbuild": {
+      "version": "0.19.12",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.19.12.tgz",
+      "integrity": "sha512-aP1LxwkoC5J9N6NnD1V7x0iVJG3E8xJQd1h3rCw6tQO3p5v3nAq8WmVixUu5z2Yw6k3F4lQb7xw1t6k7qQ2+8w=="
     }
   }
 }

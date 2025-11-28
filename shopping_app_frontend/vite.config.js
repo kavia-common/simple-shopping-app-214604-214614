@@ -11,15 +11,22 @@ export default defineConfig({
   esbuild: {
     target: 'es2020'
   },
+  optimizeDeps: {
+    // Some CI environments + Node 18 + older plugin graph can trigger optimizer
+    // code paths that rely on newer Node APIs. Disable pre-optimization to avoid it.
+    disabled: true
+  },
   build: {
     target: 'es2020'
   },
   server: {
-    host: true,
-    port: 3000
+    host: '0.0.0.0',
+    port: 3000,
+    strictPort: true,
+    hmr: { host: '0.0.0.0', port: 3000 }
   },
   preview: {
-    host: true,
+    host: '0.0.0.0',
     port: 3000
   }
 })
