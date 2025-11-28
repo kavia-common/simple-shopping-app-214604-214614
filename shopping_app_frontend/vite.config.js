@@ -24,8 +24,8 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 3000,
     strictPort: true,
-    // Let Vite infer allowed hosts and HMR target from the request origin to avoid blocking on unknown hostnames.
-    // Removing allowedHosts and explicit hmr host prevents WS connection errors that can blank the UI in preview runners.
+    // Explicitly allow the preview host used by the orchestrator to prevent Vite blocked host error.
+    allowedHosts: ['vscode-internal-22154-beta.beta01.cloud.kavia.ai'],
   },
   preview: {
     host: '0.0.0.0',
